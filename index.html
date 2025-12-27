@@ -1,0 +1,230 @@
+<!DOCTYPE index.html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEU 0036 Political Development Podcast</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 改為清爽的淺灰色背景 */
+        body { background-color: #f8fafc; min-height: 100vh; color: #1e293b; }
+        /* 卡片改為純白，並加上柔和陰影 */
+        .glass-card { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+        /* 選中週次的視覺回饋 */
+        .active-week { border-left: 5px solid #4f46e5; background: #f5f3ff; }
+        .play-btn-shadow { box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
+    </style>
+</head>
+<body class="font-sans">
+
+    <div class="max-w-md mx-auto p-6 pb-24">
+        <header class="mb-8 mt-4">
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">CEU 0036</h1>
+            <p class="text-sm text-indigo-600 font-bold uppercase tracking-widest">Political Development 2025</p>
+        </header>
+
+        <!-- 主要播放卡片 -->
+        <div class="glass-card rounded-[2.5rem] p-8 mb-10 relative overflow-hidden">
+            <div class="flex justify-between items-center mb-8">
+                <div id="lang-badge" class="px-3 py-1 bg-slate-900 text-white text-[10px] font-bold rounded-md uppercase tracking-tighter">English Mode</div>
+                <button onclick="toggleLanguage()" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition">切換語言 / Switch Language</button>
+            </div>
+            
+            <div class="mb-10">
+                <h2 id="current-title" class="text-2xl font-black text-slate-800 mb-2 leading-tight">Loading...</h2>
+                <p class="text-slate-500 text-sm italic">Summarized by AI Podcast Assistant</p>
+            </div>
+
+            <!-- 控制按鈕 -->
+            <div class="flex justify-center items-center space-x-8 mb-10">
+                <button onclick="prevWeek()" class="text-2xl text-slate-400 hover:text-indigo-600 transition"><i class="fas fa-backward-step"></i></button>
+                <button id="play-btn" onclick="togglePlay()" class="w-20 h-20 bg-indigo-600 text-white rounded-full text-3xl flex items-center justify-center play-btn-shadow transform active:scale-95 transition-all">
+                    <i id="play-icon" class="fas fa-play ml-1"></i>
+                </button>
+                <button onclick="nextWeek()" class="text-2xl text-slate-400 hover:text-indigo-600 transition"><i class="fas fa-forward-step"></i></button>
+            </div>
+
+            <!-- 進度條 -->
+            <div class="space-y-3">
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div id="progress" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+                <div class="flex justify-between text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                    <span id="current-time">Reading...</span>
+                    <span>AI Voice Engine</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 播放列表 -->
+        <div class="flex items-center justify-between mb-4 px-2">
+            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">Lecture List</h3>
+            <span class="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded font-bold">8 EPISODES</span>
+        </div>
+        
+        <div id="week-list" class="space-y-3">
+            <!-- JS 自動生成清單 -->
+        </div>
+    </div>
+
+    <script>
+        const podcastData = [
+            {
+                week: 1,
+                title_en: "Challenges & Responses",
+                title_zh: "第一週：挑戰與回應",
+                content_en: "Welcome to Political Development. Lawrence emphasizes that this is not an English language class. Don't worry about your English ability or making mistakes; what matters is sharing your ideas. Try to express yourself fully—practice makes perfect! This is a safe space to explore ideas and learn from different perspectives.",
+                content_zh: "歡迎來到政治發展課。老師強調這不是英文課，不用擔心英文能力。重要的是分享想法，不要怕出錯。試著充分表達自己，熟能生巧！這是一個安全空間，可以從不同觀點學習。"
+            },
+            {
+                week: 2,
+                title_en: "Concepts & Legitimacy",
+                title_zh: "第二週：概念與合法性",
+                content_en: "Concepts in political science are fluid. For example, democracy is defined differently in the US and China. Legitimacy is about why people trust the government. It can come from fair elections, good performance, leader charisma, or national crisis. We also explored Leftists who favor change and collective interests, versus Rightists who prioritize individualism and tradition.",
+                content_zh: "政治學概念具有流動性。例如美國與中國對民主定義不同。合法性關乎信任，來源包括公平選舉、表現、魅力或國家危機。我們也探討了追求改變與集體利益的左派，以及重視個人傳統與市場的右派。"
+            },
+            {
+                week: 3,
+                title_en: "Ideologies & Democracy",
+                title_zh: "第三週：意識形態與民主",
+                content_en: "Ideology is a set of ideas about how the world should be. Liberalism focuses on maximum freedom. Meritocracy rewards talent, but can ignore initial inequality. We compared Communism and Socialism, and explored why Taiwan's government is relatively rich through taxes and stock ownership like TSMC.",
+                content_zh: "意識形態是關於世界應如何運作的想法。自由主義強調自由最大化。菁英主義獎勵才華，但可能忽視先天不平等。我們比較了共產主義與社會主義，並探討台灣政府如何透過稅收與持有台積電股份來維持財政。"
+            },
+            {
+                week: 4,
+                title_en: "Developmentalism",
+                title_zh: "第四週：發展主義",
+                content_en: "The Little Four Dragons were all developing states and former colonies. Huntington argued that for developing countries, political order is more important than democracy. Developmental states like Taiwan and South Korea prioritized economy over politics in the early stages to achieve high growth.",
+                content_zh: "亞洲四小龍皆曾為殖民地。杭廷頓認為對發展中國家而言，政治秩序比民主更重要。發展型國家如早期的台灣與南韓，在早期階段皆採取經濟優先於政治的策略，以實現高速成長。"
+            },
+            {
+                week: 5,
+                title_en: "Case Study: Taiwan",
+                title_zh: "第五週：個案研究 - 台灣",
+                content_en: "Taiwan's democratization involved Japanese colonial legacy, U.S. pressure, social movements, and elites like Chiang Ching-kuo. Taiwan faces identity challenges and exists in a state of abnormality and ambiguity regarding its sovereignty and name as the Republic of China.",
+                content_zh: "台灣民主化因素包括日本殖民遺產、美國壓力、社會運動以及精英改革。台灣面臨身份認同挑戰，並在主權與中華民國名稱上處於「異常性」與「模糊性」的狀態。"
+            },
+            {
+                week: 9,
+                title_en: "Hong Kong & Macau",
+                title_zh: "第九週：香港與澳門",
+                content_en: "Both are SARs under One Country, Two Systems. Hong Kong's success was built on a strong British administrative system and political apathy. However, the 2020 National Security Law and integration with China have significantly changed its autonomous status.",
+                content_zh: "港澳皆為一國兩制下的特別行政區。香港的成功建立在強大的英國行政體系與政治冷漠上。然而，2020年國安法與對中整合改變了其高度自治的地位。"
+            },
+            {
+                week: 12,
+                title_en: "Case Study: PRC",
+                title_zh: "第十二週：中國研究",
+                content_en: "The CCP's goal is maintaining One Party Dictatorship. Mao focused on class struggle; Deng focused on economic performance; Xi focuses on nationalism. China now faces a demographic crisis, economic slowdown, and geopolitical challenges like the trade war.",
+                content_zh: "中共目標是維持一黨專政。毛澤東強調階級鬥爭；鄧小平轉向經濟績效；習近平則強化民族主義。中國目前面臨人口危機、經濟放緩與地緣政治貿易戰的挑戰。"
+            },
+            {
+                week: 13,
+                title_en: "Final Review & Summary",
+                title_zh: "第十三週：總結複習",
+                content_en: "In conclusion, political development is shaped by historical legacy, internal order, and global geopolitics. From developmental states to identity struggles, these concepts help us understand our world today. Good luck with your exam!",
+                content_zh: "總結來說，政治發展受歷史遺產、內部秩序與地緣政治影響。從發展型國家到身份認同鬥爭，這些概念幫助我們理解今日的世界。祝大家考試順利！"
+            }
+        ];
+
+        let currentIndex = 0;
+        let isEnglish = true;
+        let isPlaying = false;
+        let speech = new SpeechSynthesisUtterance();
+
+        function initList() {
+            const listContainer = document.getElementById('week-list');
+            listContainer.innerHTML = '';
+            podcastData.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = `glass-card p-4 rounded-2xl flex items-center justify-between cursor-pointer transition-all ${index === currentIndex ? 'active-week ring-1 ring-indigo-100' : 'hover:border-indigo-200'}`;
+                div.onclick = () => selectWeek(index);
+                div.innerHTML = `
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-800 font-black text-xs">${index + 1}</div>
+                        <div>
+                            <div class="text-sm font-black text-slate-800">${isEnglish ? item.title_en : item.title_zh}</div>
+                            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Audio Summary</div>
+                        </div>
+                    </div>
+                    <i class="fas ${index === currentIndex && isPlaying ? 'fa-pause text-indigo-600' : 'fa-play text-slate-300'} text-xs"></i>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        function selectWeek(index) {
+            currentIndex = index;
+            stopSpeech();
+            updatePlayer();
+            initList();
+        }
+
+        function updatePlayer() {
+            const data = podcastData[currentIndex];
+            document.getElementById('current-title').innerText = isEnglish ? data.title_en : data.title_zh;
+            document.getElementById('lang-badge').innerText = isEnglish ? 'English Mode' : '中文模式';
+            document.getElementById('progress').style.width = '0%';
+        }
+
+        function toggleLanguage() {
+            isEnglish = !isEnglish;
+            stopSpeech();
+            updatePlayer();
+            initList();
+        }
+
+        function togglePlay() {
+            if (isPlaying) stopSpeech();
+            else startSpeech();
+        }
+
+        function startSpeech() {
+            isPlaying = true;
+            const data = podcastData[currentIndex];
+            const text = isEnglish ? data.content_en : data.content_zh;
+            
+            speech = new SpeechSynthesisUtterance(text);
+            speech.lang = isEnglish ? 'en-US' : 'zh-TW';
+            speech.rate = 1.0; 
+            
+            document.getElementById('play-icon').className = 'fas fa-pause';
+            window.speechSynthesis.speak(speech);
+
+            let prog = 0;
+            const interval = setInterval(() => {
+                if (!isPlaying) clearInterval(interval);
+                prog += 0.5;
+                document.getElementById('progress').style.width = Math.min(prog, 100) + '%';
+                if (prog >= 100) clearInterval(interval);
+            }, 200);
+
+            speech.onend = () => stopSpeech();
+        }
+
+        function stopSpeech() {
+            isPlaying = false;
+            window.speechSynthesis.cancel();
+            document.getElementById('play-icon').className = 'fas fa-play ml-1';
+            document.getElementById('progress').style.width = '0%';
+            initList();
+        }
+
+        function nextWeek() {
+            currentIndex = (currentIndex + 1) % podcastData.length;
+            selectWeek(currentIndex);
+        }
+
+        function prevWeek() {
+            currentIndex = (currentIndex - 1 + podcastData.length) % podcastData.length;
+            selectWeek(currentIndex);
+        }
+
+        window.onload = () => {
+            initList();
+            updatePlayer();
+        };
+    </script>
+</body>
+</html>
