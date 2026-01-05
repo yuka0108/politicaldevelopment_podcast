@@ -5,115 +5,219 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CEU 0036 | Political Development AI Study Tool</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        :root { --primary: #2563eb; --bg: #ffffff; --card-bg: #f8fafc; --text: #0f172a; }
-        .dark-mode { --primary: #60a5fa; --bg: #020617; --card-bg: #0f172a; --text: #f1f5f9; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; transition: background-color 0.3s ease; }
-        .premium-card { background-color: var(--card-bg); border: 1px solid rgba(0,0,0,0.05); }
-        .dark-mode .premium-card { border: 1px solid rgba(255,255,255,0.05); }
-        .progress-bar-container { height: 8px; background: rgba(0,0,0,0.1); border-radius: 10px; overflow: hidden; cursor: pointer; position: relative; }
-        .dark-mode .progress-bar-container { background: rgba(255,255,255,0.1); }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.1s linear; }
-        .rate-btn { @apply border-2 border-blue-500 text-blue-600 dark:text-blue-400 font-black rounded-full px-3 py-1 text-xs transition-all active:scale-95; }
-        .btn-control { @apply transition-all active:scale-90 hover:opacity-70; }
-        .selected-item { background-color: var(--bg); border: 2px solid var(--primary); box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2); opacity: 1 !important; }
-        #script-content { line-height: 1.8; letter-spacing: 0.01em; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #2563eb;
+            --accent: #3b82f6;
+            --bg: #f8fafc;
+            --text: #0f172a;
+            --glass: rgba(255, 255, 255, 0.7);
+        }
+
+        .dark-mode {
+            --primary: #60a5fa;
+            --accent: #2563eb;
+            --bg: #020617;
+            --text: #f1f5f9;
+            --glass: rgba(15, 23, 42, 0.7);
+        }
+
+        body { 
+            background-color: var(--bg); 
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background-image: radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.03) 0%, transparent 50%),
+                              radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.03) 0%, transparent 50%);
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        .fluid-progress {
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 20px;
+            overflow: visible;
+            cursor: pointer;
+            position: relative;
+        }
+        .dark-mode .fluid-progress { background: rgba(255,255,255,0.05); }
+
+        .fluid-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 20px;
+            width: 0%;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+
+        .fluid-fill::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+        }
+
+        .episode-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+
+        .episode-card.active {
+            background: var(--glass);
+            border-color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15);
+        }
+
+        .prof-voice-badge {
+            background: linear-gradient(45deg, #2563eb, #7c3aed);
+            color: white;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(37, 99, 235, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+
+        .play-btn-main {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .play-btn-main:active { transform: scale(0.9); }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .mode-tag { @apply text-[9px] px-2 py-0.5 rounded-full font-black ml-2 uppercase; }
+        
+        .transcript-line {
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .transcript-line:hover { color: var(--primary); background: rgba(37, 99, 235, 0.05); border-radius: 4px; }
     </style>
 </head>
 <body class="antialiased no-scrollbar">
 
-    <div class="max-w-xl mx-auto px-6 py-12 pb-32">
+    <div class="max-w-6xl mx-auto px-6 py-12">
         <!-- Header -->
-        <nav class="flex justify-between items-center mb-10">
-            <div>
-                <h1 class="text-xl font-extrabold tracking-tighter text-blue-600">CEU 0036 <span class="font-light text-slate-400">/Political Development</span></h1>
+        <header class="flex justify-between items-center mb-16 px-2">
+            <div class="space-y-1">
+                <h1 class="text-2xl font-extrabold tracking-tighter flex items-center">
+                    <span class="text-blue-600 mr-2">CEU 0036</span>
+                    <span class="font-light opacity-30">|</span>
+                    <span class="ml-2 font-semibold text-lg opacity-80 tracking-tight">Political Development</span>
+                </h1>
+                <p class="text-[9px] font-black uppercase tracking-[0.3em] opacity-30">Interactive Study Environment</p>
             </div>
-            <button onclick="toggleDarkMode()" class="text-sm opacity-50 hover:opacity-100 transition p-2">
-                <i id="dark-icon" class="fas fa-moon"></i>
+            <button onclick="toggleDarkMode()" class="w-12 h-12 rounded-2xl glass-card flex items-center justify-center hover:bg-white transition-all">
+                <i id="dark-icon" class="fas fa-moon text-sm"></i>
             </button>
-        </nav>
+        </header>
 
-        <!-- Player Card -->
-        <section class="premium-card rounded-3xl p-8 mb-12 shadow-sm">
-            <div class="flex justify-between items-start mb-8">
-                <div id="keywords-container" class="flex flex-wrap gap-2 max-w-[70%]"></div>
-                <div class="flex bg-slate-200 dark:bg-slate-800 rounded-lg p-1">
-                    <button onclick="setLang('en')" id="btn-en" class="px-3 py-1 text-[10px] font-bold rounded-md transition-all">EN</button>
-                    <button onclick="setLang('zh')" id="btn-zh" class="px-3 py-1 text-[10px] font-bold rounded-md transition-all">中</button>
-                </div>
-            </div>
-
-            <h2 id="display-title" class="text-2xl font-bold mb-2 tracking-tight min-h-[3.5rem]">Loading...</h2>
-            <div class="flex items-center mb-10 text-[11px] font-bold opacity-40 uppercase tracking-widest">
-                <span id="display-ep">EP 01</span>
-                <span class="mx-2">•</span>
-                <span id="display-time">0 MINS</span>
-                <span id="audio-mode" class="mode-tag bg-blue-100 text-blue-600 dark:bg-blue-900/40">VOICE</span>
-            </div>
-
-            <div class="flex flex-col space-y-10">
-                <div class="flex justify-between items-center px-4">
-                    <button onclick="prevWeek()" class="btn-control text-sm opacity-30 hover:opacity-100"><i class="fas fa-step-backward"></i></button>
-
-                    <div class="flex items-center space-x-8">
-                        <button onclick="skip(-5)" class="btn-control text-xl opacity-40 hover:opacity-100 text-center">
-                            <i class="fas fa-undo"></i>
-                            <span class="block text-[8px] font-black mt-1">5S</span>
-                        </button>
-                        
-                        <button onclick="togglePlay()" id="main-play-btn" class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl shadow-lg shadow-blue-500/40 active:scale-95 transition-all">
-                            <i id="play-icon" class="fas fa-play ml-1"></i>
-                        </button>
-
-                        <button onclick="skip(5)" class="btn-control text-xl opacity-40 hover:opacity-100 text-center">
-                            <i class="fas fa-redo"></i>
-                            <span class="block text-[8px] font-black mt-1">5S</span>
-                        </button>
-                    </div>
-
-                    <button onclick="nextWeek()" class="btn-control text-sm opacity-30 hover:opacity-100"><i class="fas fa-step-forward"></i></button>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="flex items-center space-x-4">
-                        <div class="progress-bar-container flex-1" onclick="handleSeek(event)">
-                            <div id="progress-fill" class="progress-fill"></div>
-                        </div>
-                        <button onclick="cycleRate()" id="rate-display" class="rate-btn min-w-[50px]">1.0x</button>
-                    </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            
+            <!-- Left Column -->
+            <main class="lg:col-span-7 space-y-8">
+                
+                <section class="glass-card rounded-[2.5rem] p-10 relative overflow-hidden">
+                    <div id="keywords-container" class="flex flex-wrap gap-2 mb-10"></div>
                     
-                    <div class="flex justify-between text-[10px] font-black opacity-30 uppercase tracking-widest">
-                        <span id="play-status">STANDBY</span>
-                        <span id="word-count">0 WORDS</span>
+                    <div class="flex justify-between items-end mb-10">
+                        <div class="space-y-2">
+                            <span id="display-ep" class="text-[10px] font-black tracking-widest text-blue-500 uppercase">EPISODE 01</span>
+                            <h2 id="display-title" class="text-3xl font-extrabold tracking-tight leading-tight">Loading...</h2>
+                        </div>
+                        <div id="audio-mode" class="text-[9px] font-black px-3 py-1.5 rounded-full border border-blue-500/20 text-blue-500 uppercase tracking-tighter">VOICE</div>
                     </div>
+
+                    <!-- Progress Bar -->
+                    <div class="space-y-4 mb-10">
+                        <div class="fluid-progress" onclick="handleSeek(event)">
+                            <div id="progress-fill" class="fluid-fill"></div>
+                        </div>
+                        <div class="flex justify-between text-[10px] font-bold opacity-30 tracking-widest uppercase">
+                            <span id="play-status">Standby</span>
+                            <span id="display-time">0:00 / 0:00</span>
+                        </div>
+                    </div>
+
+                    <!-- Main Controls -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex bg-slate-100 dark:bg-slate-800 rounded-2xl p-1 shadow-inner">
+                            <button onclick="setLang('en')" id="btn-en" class="px-6 py-2.5 text-[10px] font-black rounded-xl transition-all">ENGLISH</button>
+                            <button onclick="setLang('zh')" id="btn-zh" class="px-6 py-2.5 text-[10px] font-black rounded-xl transition-all">中文</button>
+                        </div>
+
+                        <div class="flex items-center space-x-6">
+                            <button onclick="skip(-5)" class="w-12 h-12 rounded-2xl border border-black/5 flex items-center justify-center opacity-40 hover:opacity-100 transition active:scale-90">
+                                <i class="fas fa-undo-alt text-lg"></i>
+                            </button>
+                            
+                            <button onclick="togglePlay()" id="main-play-btn" class="play-btn-main w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl shadow-2xl shadow-blue-500/40">
+                                <i id="play-icon" class="fas fa-play ml-1"></i>
+                            </button>
+
+                            <button onclick="skip(5)" class="w-12 h-12 rounded-2xl border border-black/5 flex items-center justify-center opacity-40 hover:opacity-100 transition active:scale-90">
+                                <i class="fas fa-redo-alt text-lg"></i>
+                            </button>
+                        </div>
+
+                        <button onclick="cycleRate()" id="rate-display" class="w-14 h-14 rounded-2xl glass-card flex items-center justify-center text-[11px] font-black border-2 border-blue-500/10 text-blue-500">1.0x</button>
+                    </div>
+                </section>
+
+                <!-- Transcript Area -->
+                <section class="glass-card rounded-[2.5rem] p-10">
+                    <div class="flex items-center justify-between mb-10">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-1.5 h-6 bg-blue-600 rounded-full shadow-[0_0_10px_rgba(37,99,235,0.5)]"></div>
+                            <h3 class="text-xs font-black uppercase tracking-widest opacity-50">Transcript</h3>
+                        </div>
+                        <button onclick="copyScript()" class="text-[9px] font-black hover:text-blue-500 tracking-widest uppercase opacity-40 hover:opacity-100 transition">Copy All</button>
+                    </div>
+                    <div id="script-content" class="text-[17px] leading-[2.3] opacity-80 text-justify font-medium"></div>
+                </section>
+            </main>
+
+            <!-- Right Column -->
+            <aside class="lg:col-span-5 space-y-6">
+                <div class="flex items-center space-x-3 mb-4 px-2">
+                    <h3 class="text-[11px] font-black uppercase tracking-[0.3em] opacity-30">Learning Roadmap</h3>
                 </div>
-            </div>
-        </section>
-
-        <!-- Transcript Section -->
-        <section class="mb-20">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xs font-black uppercase tracking-widest opacity-50">Transcript / 講稿</h3>
-                <button onclick="copyScript()" class="text-[10px] font-bold hover:text-blue-500 transition border-b border-dotted">COPY TEXT</button>
-            </div>
-            <div id="script-content" class="text-lg opacity-80 whitespace-pre-wrap text-justify leading-relaxed"></div>
-        </section>
-
-        <!-- Playlist -->
-        <section>
-            <h3 class="text-xs font-black uppercase tracking-widest opacity-30 mb-6 px-2">Course Modules</h3>
-            <div id="playlist" class="space-y-3"></div>
-        </section>
+                <div id="playlist" class="space-y-4"></div>
+            </aside>
+        </div>
     </div>
 
     <script>
+        // Google Drive IDs provided by the user
+        const GDriveIDs = {
+            ep1: "1scEPai3mB11k7jMwxqf1MBEBYZg8Dpnr",
+            ep2: "1huUrMPapOELNkeJnHs3aLjgeqo6XH22n",
+            ep3: "1jAmhkP45QjAr8KMSikTUChac8I-m1a_u"
+        };
+
         const podcastData = [
             { 
-                week: 1, hasAudio: true, 
+                week: 1, hasAudio: true, audioId: GDriveIDs.ep1, 
                 title_en: "Introduction & Challenges", 
                 title_zh: "第一週：課程導論與心理建設", 
                 tags: ["Mindset", "Bilingual"], 
@@ -121,19 +225,19 @@
                 content_zh: `各位同學大家好，歡迎來到我們的課程！在正式開始之前，我想先跟大家聊聊一件很重要的事——沒錯，就是你們心裡那些「我會不會不行啊？」的小擔心。放心，你不是一個人，我都懂。首先，很多人會擔心：「我英文不好怎麼辦？」來，老師先跟你說清楚一件事：我們是用英文上課，但我們不是在上英文課。所以前提一成立——這不是語言測驗；前提二是——學習的重點在內容；結論就是：你不需要完美英文，也能在這堂課學得很好！說錯沒關係，敢說、願意說，才是真正重要的事。那再來，有人會想：「可是我一開口就緊張啊！」對，緊張很正常，因為你在做一件不熟悉、但很有價值的事。既然緊張來自不熟，那只要多練就會變熟；既然變熟就會減少緊張；所以結論很簡單——給自己機會開口，你一定會進步！而且我保證，這裡沒有人會笑你。第三個，寫英文 essay 會不會很可怕？先深呼吸！之後 Lawrence 會清楚說明格式和要求，你也可以適度使用 AI 幫忙，只要記得誠實說明怎麼用。前提是有清楚指引，前提是有工具可用，那結論就是：你不是孤軍奮戰。還有人會說：「老師，我沒有政治背景耶，我的想法會不會很遜？」我反而要說，這正是你來這堂課最好的理由！因為如果你已經都會了，你還需要來學嗎？前提是課程是為了學習；前提是學習從不會開始；所以結論是：你現在不懂，完全沒有問題！交換生、非本地生更是如此，你們的文化觀點，會讓討論變得更精彩。那如果你聽不太懂學術英文或政治術語呢？別擔心。聽不懂代表你正在接觸新東西；接觸新東西就需要時間；所以結論是——問就對了！老師會多解釋、也會放慢速度，你下課後、寄信問，中英文都可以。最後，有人會焦慮 GPA，或怕找不到組員。來，老師再說一次：分組會協助安排，沒有人會被丟下；成績看的是努力，不只是結果。既然你願意投入，我們就會陪你走到最後。所以同學們，總結一句話：你不需要現在就很厲害，你只需要願意開始。這堂課，就是我們一起變厲害的地方。準備好了嗎？那我們就出發吧！` 
             },
             { 
-                week: 2, hasAudio: true, 
+                week: 2, hasAudio: true, audioId: GDriveIDs.ep2,
                 title_en: "Fluidity of Concepts", 
                 title_zh: "第二週：概念的流動性與合法性", 
                 tags: ["Concepts", "Legitimacy"], 
                 content_en: `Alright, let’s go back to what we covered on week 2. This lecture is really about one thing: getting you to realize that many political terms you take for granted are actually far less stable than they seem. Let’s start with a basic question: what is a concept? In political science, a concept is an abstract idea without a fixed definition. This is not a weakness — it’s exactly what makes concepts useful. Politics changes, so concepts have to be flexible. Take democracy as an example. Most people would agree that the United States is a democratic country. But China also claims that it is democratic. So here’s the problem: if two very different political systems can both use the same word, where is the issue? The answer is not simply that one side is lying. It’s that the concept of democracy itself is fluid. Concepts adjust to context. When the Chinese Communist Party describes its system as “Socialism with Chinese Characteristics,” it is not rejecting socialism. It is redefining it. This shows why concepts are powerful in politics: they are flexible enough to be imported, adapted, and implemented in very different settings. Next, legitimacy. Legitimacy is not about legality; it’s about trust. Do people accept the government, and why? There are four main ways governments build that trust. One is fair and clean elections. Another is good performance — but this is risky, because no government can perform well forever. When performance declines, legitimacy can quickly be questioned, as we've seen recently in Indonesia and Nepal. A third source is a leader’s charisma, which usually does not last long. The fourth is identifying enemies. During national crises, people often unite against a common enemy, even if they dislike the government or its leaders. So here’s something to think about: if a government has no elections and only average performance, but still enjoys public support, does it have legitimacy? Then we move to leftists and rightists. Leftists tend to support change, new values such as diversity, equality, and inclusion, and they prioritize collective interests. They believe the government should play an active role in managing the economy and caring for society. Rightists are generally more conservative. They emphasize tradition, individualism, capitalism, and free markets, and they prefer minimal government intervention. This is not about which side is morally correct. It’s about different value priorities. That leads us to protectionism. Protectionism refers to policies that restrict imports in order to protect domestic industries, usually through tariffs or quotas. The goal is to make imported goods more expensive and support local jobs. However, in practice, these costs are often passed on to consumers, raising prices not only for imports but sometimes for domestic products as well. Finally, let’s look at recent social changes. Historically, countries with high levels of immigration tended to lean left. Today, however, growing skepticism toward globalization has pushed many societies to focus more on national interests, leading to a shift toward the right. Brexit is a clear example. Alright, we’ll stop here for now. You don’t need to settle on answers yet. Just remember to pause the next time you hear these concepts and ask yourself how, and why, they are being used.`, 
-                content_zh: `好，我們來回到第二周的這堂課。這一堂課其實在做一件事，就是帶你開始理解：政治學裡，很多你以為很穩定的詞，其實一點都不穩定。我們先從一個最基本的問題開始：什麼是概念？在政治學裡，概念是一種抽象的想法，而且通常沒有一個「標準答案式」的定義。這不是因為學者懶，而是因為政治本身就在變動。概念如果太死，就用不了。舉一個大家最熟的例子，民主。美國是民主國家，這點多數人不會反對；但中國也宣稱自己是民主國家。那問題來了——如果這兩個制度差這麼多，卻都能用同一個詞，問題出在哪？答案通常不是「誰比較誠實」，而是：民主這個概念本身就具有流動性。概念會依照脈絡被重新定義、重新包裝。中國共產黨說自己的制度是「中國特色社會主義」，並不是說它不用社會主義這個概念，而是它重新設定了這個概念的標準。這正好說明一件事：概念之所以有力量，是因為它夠模糊，能被不同國家「拿去用」。接下來是合法性。合法性不是在問合不合法，而是在問：人民信不信你。那政府怎麼讓人民相信它？大致有四種方式。第一，公平而且沒有貪腐的民主選舉。第二，良好的施政表現。但這一種其實風險很高，因為沒有任何政府可以保證自己永遠表現良好。一旦表現下滑，合法性就會開始被質疑，最近印尼和尼泊爾的情況就是很好的觀察點。第三，領導人的個人魅力。不過這種魅力通常不耐久。第四，樹立敵人。在國家危機時，人們很容易因為「對抗共同敵人」而團結起來，甚至願意支持一個他們平常並不喜歡的政府。那這裡我想你停一下，想一個問題：如果一個政府沒有選舉、表現也只是普通，但人民仍然支持它，這樣算不算有合法性？再來談左派與右派。左派通常偏好改變，支持新的價值觀，例如多元、平等與包容，也比較重視集體利益，認為政府應該更積極介入經濟與社會，照顧人民。右派則相對保守，重視傳統、個人主義與資本主義，傾向支持自由市場，認為政府最好少干預。這不是對錯問題，而是價值選擇的問題。講到這裡，就會自然連到保護主義。保護主義是政府限制進口、保護國內產業的經濟政策，例如透過關稅或配額。目的很清楚，就是讓進口商品變貴，鼓勵大家買國產貨、保護本地工作機會。但現實往往是，這些成本最後會轉嫁到消費者身上，不只進口商品變貴，連國內商品也可能一起漲價。所以問題從來不是「保護主義好不好」，職是你願不願意為它付出代價。最後，把這些放到近幾年的社會變化來看。過去，高移民國家往往比較偏左；但現在，越來越多人對全球化感到懷疑，開始更關注自己的國家與邊界，政治立場也慢慢往右移。英國脫歐就是一個很典型的例子。好，我們今天就先停在這裡。你現在不用急著下判斷，但下次再聽到這些詞的時候，記得多問一句：這個概念，是在什麼情況下被誰用來說明什麼事情。` 
+                content_zh: `好，我們來回到第二周的這堂課。這一堂課其實在做一件事，就是帶你開始理解：政治學裡，很多你以為很穩定的詞，其實一點都不穩定。我們先從一個最基本的問題開始：什麼是概念？在政治學裡，概念是一種抽象的想法，而且通常沒有一個「標準答案式」的定義。這不是因為學者懶，而是因為政治本身就在變動。概念如果太死，就用不了。舉一個大家最熟的例子，民主。美國是民主國家，這點多數人不會反對；但中國也宣稱自己是民主國家。那問題來了——如果這兩個制度差這麼多，卻都能用同一個詞，問題出在哪？答案通常不是「誰比較誠實」，而是：民主這個概念本身就具有流動性。概念會依照脈絡被重新定義、重新包裝。中國共產黨說自己的制度是「中國特色社會主義」，並不是說它不用社會主義這個概念，而是它重新設定了這個概念的標準。這正好說明一件事：概念之所以有力量，是因為它夠模糊，能被不同國家「拿去用」。接下來是合法性。合法性不是在問合不合法，而是在問：人民信不信你。那政府怎麼讓人民相信它？大致有四種方式。第一，公平而且沒有貪腐的民主選舉。第二，良好的施政表現。但這一種其實風險很高，因為沒有任何政府可以保證自己永遠表現良好。一旦表現下滑，合法性就會開始被質疑，最近印尼和尼泊爾的情況就是很好的觀察點。第三，領導人的個人魅力。不過這種魅力通常不耐久。第四，樹立敵人。在國家危機時，人們很容易因為「對抗共同敵人」而團結起來，甚至願意支持一個他們平常並不喜歡的政府。那這裡我想你停一下，想一個問題：如果一個政府沒有選舉、表現也只是普通，但人民仍然支持它，這樣算不算有合法性？再來談左派與右派。左派通常偏好改變，支持新的價值觀，例如多元、平等與包容，也比較重視集體利益，認為政府應該更積極介入經濟與社會，照顧人民。右派則相對保守，重視傳統、個人主義與資本主義，傾向支持自由市場，認為政府最好少干預。這不是對錯問題，而是價值選擇的問題。講到這裡，就會自然連到保護主義。保護主義是政府限制進口、保護國內產業的經濟政策，例如透過關稅或配額。目的很清楚，就是讓進口商品變貴，鼓勵大家買國產貨、保護本地工作機會。但現實往往是，這些成本最後會轉嫁到消費者身上，不只進口商品變貴，連國內商品也可能一起漲價。所以問題從來不是「保護主義好不好」，而是：你願不願意為它付出代價。最後，把這些放到近幾年的社會變化來看。過去，高移民國家往往比較偏左；但現在，越來越多人對全球化感到懷疑，開始更關注自己的國家與邊界，政治立場也慢慢往右移。英國脫歐就是一個很典型的例子。好，我們今天就先停在這裡。你現在不用急著下判斷，但下次再聽到這些詞的時候，記得多問一句：這個概念，是在什麼情況下被誰用來說明什麼事情。` 
             },
             { 
-                week: 3, hasAudio: true, 
+                week: 3, hasAudio: true, audioId: GDriveIDs.ep3,
                 title_en: "Ideology & Liberty", 
                 title_zh: "第三週：意識形態、自由與脆弱的民主", 
                 tags: ["Ideology", "Equality"], 
-                content_en: `Week 3 – Ideology, Liberty, and the Fragility of Democracy. Alright, today let’s start with something that sounds simple, but really isn’t. We often talk about -isms in politics—liberalism, socialism, communism—as if they were clearly defined boxes. But the truth is, all of these are ideologies, and ideology itself is already a slippery thing. So what is an ideology? At its core, it’s a systematic set of ideas about what the world should look like. And notice the word should. That’s where the problem begins. Because once we talk about “should,” we’re no longer describing reality—we’re making normative claims. And like most concepts in political science, ideology never has one definition that everyone agrees on. Let’s take liberalism as an example. Liberalism is built on the idea of liberty: everyone should enjoy the maximum possible freedom, as long as it doesn’t infringe on the freedom of others. Sounds reasonable, right? But very quickly, we run into questions. Think about everyday behavior. In China, it’s common to see people watching videos out loud on the subway. In Taiwan, it happens less often. In Japan, social norms are so strong that phones are expected to be on manner mode. So here’s the question: whose liberty matters more—the individual’s, or everyone else’s? And once you open that door, harder questions follow. Is mercy killing part of liberty? What about the right to own a gun? Liberalism doesn’t give you easy answers. It gives you a framework—and then leaves you uncomfortable. Now add meritocracy into the picture. The idea sounds fair: rewards should go to those with talent and effort. But here’s a line worth sitting with: If you truly believe people deserve their success, you also truly believe people deserve their suffering. That’s not an attack—it’s a logical implication. This leads us to equality. Liberal systems often claim to treat everyone equally: open competition, equal rules, neutral institutions. But is it reasonable to treat people equally when they are born with very unequal forms of capital—economic, social, cultural? Pierre Bourdieu would tell us that pretending these differences don’t exist doesn't make society fair; it just makes inequality harder to see. Now let’s shift to communism and socialism. In theory, socialism is a transitional stage toward a communist utopia. In communism, there is no free market, because competition produces inequality. Money loses its meaning, and everyone is equal—at least on paper. Many countries claim this identity: China, Vietnam, Cuba, North Korea. Whether they actually match the theory is another question entirely. Let’s ground this discussion with something concrete: taxes. In Sweden, income tax can reach 60 to 70 percent. In Taiwan, the maximum is about 30 percent, and most locals pay far less. Yet the Taiwanese government is relatively wealthy—thanks to profit taxes, consumption taxes, state-owned assets like TSMC, and high tariffs. These are political choices, rooted in ideology, not accidents. Now, what about democracy? We often treat it as a yes-or-no label, but that’s misleading. Instead, think of democracy as having dimensions: elections, freedom of speech, freedom of movement, freedom of relationships. Even these are regulated. Germany restricts Nazi speech. China restricts movement through the household registration system. Every system draws lines somewhere. Finally, let’s talk about developmentalism. The idea that economic growth comes first, and everything else comes later. Taiwan, South Korea, Singapore, Hong Kong—all followed this path, and it worked economically. But here’s the uncomfortable question: should democracy wait until people are fed? Some argue yes—because democracy without state capacity is fragile. Others argue that postponing democracy risks never getting it at all. And even the rise of a middle class doesn’t guarantee democratization. Wealth doesn't protest by itself. People do. So I’ll stop here, not with an answer, but with a question. When you hear words like freedom, equality, or democracy, the real issue isn’t whether they sound good. It’s who gets to define them—and when.`, 
+                content_en: `Week 3 – Ideology, Liberty, and the Fragility of Democracy. Alright, today let’s start with something that sounds simple, but really isn’t. We often talk about -isms in politics—liberalism, socialism, communism—as if they were clearly defined boxes. But the truth is, all of these are ideologies, and ideology itself is already a slippery thing. So what is an ideology? At its core, it’s a systematic set of ideas about what the world should look like. And notice the word should. That’s where the problem begins. Because once we talk about “should,” we’re no longer describing reality—we’re making normative claims. And like most concepts in political science, ideology never has one definition that everyone agrees on. Let’s take liberalism as an example. Liberalism is built on the idea of liberty: everyone should enjoy the maximum possible freedom, as long as it doesn’t infringe on the freedom of others. Sounds reasonable, right? But very quickly, we run into questions. Think about everyday behavior. In China, it’s common to see people watching videos out loud on the subway. In Taiwan, it happens less often. In Japan, social norms are so strong that phones are expected to be on manner mode. So here’s the question: whose liberty matters more—the individual’s, or everyone else’s? And once you open that door, harder questions follow. Is mercy killing part of liberty? What about the right to own a gun? Liberalism doesn't give you easy answers. It gives you a framework—and then leaves you uncomfortable. Now add meritocracy into the picture. The idea sounds fair: rewards should go to those with talent and effort. But here’s a line worth sitting with: If you truly believe people deserve their success, you also truly believe people deserve their suffering. That’s not an attack—it’s a logical implication. This leads us to equality. Liberal systems often claim to treat everyone equally: open competition, equal rules, neutral institutions. But is it reasonable to treat people equally when they are born with very unequal forms of capital—economic, social, cultural? Pierre Bourdieu would tell us that pretending these differences don’t exist doesn't make society fair; it just makes inequality harder to see. Now let’s shift to communism and socialism. In theory, socialism is a transitional stage toward a communist utopia. In communism, there is no free market, because competition produces inequality. Money loses its meaning, and everyone is equal—at least on paper. Many countries claim this identity: China, Vietnam, Cuba, North Korea. Whether they actually match the theory is another question entirely. Let’s ground this discussion with something concrete: taxes. In Sweden, income tax can reach 60 to 70 percent. In Taiwan, the maximum is about 30 percent, and most locals pay far less. Yet the Taiwanese government is relatively wealthy—thanks to profit taxes, consumption taxes, state-owned assets like TSMC, and high tariffs. These are political choices, rooted in ideology, not accidents. Now, what about democracy? We often treat it as a yes-or-no label, but that’s misleading. Instead, think of democracy as having dimensions: elections, freedom of speech, freedom of movement, freedom of relationships. Even these are regulated. Germany restricts Nazi speech. China restricts movement through the household registration system. Every system draws lines somewhere. Finally, let’s talk about developmentalism. The idea that economic growth comes first, and everything else comes later. Taiwan, South Korea, Singapore, Hong Kong—all followed this path, and it worked economically. But here’s the uncomfortable question: should democracy wait until people are fed? Some argue yes—because democracy without state capacity is fragile. Others argue that postponing democracy risks never getting it at all. And even the rise of a middle class doesn’t guarantee democratization. Wealth doesn't protest by itself. People do. So I’ll stop here, not with an answer, but with a question. When you hear words like freedom, equality, or democracy, the real issue isn’t whether they sound good. It’s who gets to define them—and when.`, 
                 content_zh: `第 3 週：意識形態、自由，以及民主的脆弱性。好，今天我們先從一個看起來很基本、但其實一點也不簡單的問題開始。政治裡有很多 -ism，自由主義、社會主義、共產主義，我們常常把它們當成已經定義好的分類。但事實上，它們全部都是意識形態，而意識形態本身，就已經很難被清楚定義。那什麼是意識形態？簡單說，它是一套系統性的想法，告訴我們這個世界「應該」長什麼樣子。重點就在「應該」這兩個字。因為一旦談到應該，我們談的就不再是事實，而是價值判斷。而在政治學裡，價值幾乎永遠不會只有一種版本。以自由主義為例。自由主義對「自由」的理解是：每個人都應該擁有最大的自由，但不能侵犯他人的自由。這聽起來很合理，但問題馬上就來了。想想日常生活的例子。在中國，地鐵上外放影片很常見。在台灣，比較少看到。在日本，社會規範強到你不上靜音，反而顯得失禮。所以問題是：這裡被優先保護的自由，到底是誰方的？一旦你開始問這個問題，後面的問題只會更難。安樂死算不算自由？擁槍權算不算自由？自由主義不會直接給你答案，它只會逼你面對選擇背後的代價。接著把精英主義放進來看。精英主義認為，獎勵應該依照能力與成就分配，聽起來也很公平。但有一句話你可以慢慢想：「如果你真的相信人應得成功，那你其實也同時相信人應得苦難。」這不是情緒性的批評，而是一個邏輯推論。這就帶我們走向平等的問題。自由主義制度強調形式上的平等：規則一樣、競爭開放、不看背景。但當人一出生就擁有不同的經濟、社會、文化資本時，這樣的平等真的合理嗎？布赫迪厄會提醒我們，忽視差異，並不會消除不平等，只會讓它看起來比較「自然」。再來看共產主義與社會主義。理論上，社會主義是通往共產主義烏托邦的過渡階段。在共產主義裡，沒有自由市場，因為競爭會製造不平等；金錢失去意義，人人平等——至少在理論上是這樣。許多國家都自稱如此，但是否真的符合這個理想，是另一個問題。我們用一個很實際的例子來看意識形態怎麼落地：稅制。瑞典的所得稅高達六、七成。台灣最高約三成，而且多數人繳得更少。但台灣政府並不窮，因為有營業稅、消費稅、國營或半國營企業、以及高關稅。這些都不是自然現象，而是政治選擇。談到民主，我們也常犯一個錯誤：把它當成「有或沒有」。比較好的方式，是把民主看成一組面向：選舉、言論自由、行動自由、關係自由。而且這些自由，永遠都有界線。德國禁止納粹言論，中國透過戶籍制度限制移動。沒有任何制度是完全不畫線的。最後談發展主義。經濟優先，其餘延後。台灣、南韓、新加坡、香港都走過這條路，而且在經濟上非常成功。但問題來了：民主，能不能等到大家吃飽之後再說？有人認為可以，因為沒有國家能力的民主很脆弱。也有人認為，一旦延後，民主可能永遠不會來。即使中產階級出現，也不保證民主化會發生。財富本身不會推動政治，人會。希望你之後再聽到「自由」、「平等」、「民主」這些詞的時候，能多停一秒。問的不是它們好不好聽，而是——是誰在定義，又是在什麼情境下定義的。` 
             },
             { 
@@ -142,15 +246,15 @@
                 title_zh: "第四週：政治秩序與歷史重量", 
                 tags: ["Developmentalism", "Order"], 
                 content_en: `Week 4 – Order Before Democracy, and the Weight of History. Alright, this week, I want to start from something that looks like a coincidence—but probably isn’t. When we talk about the so-called Little Four Dragons in Asia, we notice a set of striking similarities. First, they were all developing states. Second, in their early stages, they did not embrace free trade. They closed their doors. Third—and this matters more than people like to admit—they were all former colonies. In Asia, only Thailand was never colonized. Everyone else has a colonial history somewhere in the background. After World War II, most of these places gained independence. But here’s the part that tends to surprise students: independence did not automatically lead to democracy. In fact, many countries quickly moved into military dictatorships. So if independence doesn’t guarantee democracy, what does development actually require? Let’s take Taiwan in the 1950s to 1970s as an example. The political language of that period constantly emphasized self-strengthening and restoration. But think about this carefully: a healthy country that feels secure does not constantly talk about restoration. You only talk about restoring something when you believe something has been lost. This also helps explain why the early KMT focused so strongly on cultural legitimacy. Competing with the CCP, they emphasized “Chinese culture” rather than Taiwanese culture—not just culturally, but politically. Now let’s step back and talk theory. Political development is often discussed through four key components: order, development, culture, and identity. Order comes first. Order means the ability of a country to operate stably, to manage conflict through rules rather than force. Samuel Huntington put it bluntly in 1968: the most important political requirement of developing countries is political order, not democracy. This is uncomfortable for many people to hear. But Huntington’s argument is simple: when social and economic change moves faster than political institutions, instability follows. Development, then, is not just about GDP growth. It’s about whether institutions can actually keep up with change. Culture shapes how people understand authority, obedience, and legitimacy. And identity—who belongs, who doesn’t—often becomes political precisely when institutions are weak. Now, how do we explain development paths? Modernization theory tells a very optimistic story: once the middle class gets rich, democracy will follow. History suggests this is far too linear. In some cases, rising middle classes prefer stability, not political risk. Dependency theory and world-systems theory remind us that countries do not develop in isolation. Colonial history creates resentment, but also structural dependence. Where you sit in the global system—core, semi-periphery, or periphery—shapes your options. Then there’s the developmental state model. Taiwan, South Korea, Singapore, Hong Kong—none were fully democratic in their early stages. The state intervened heavily in markets. Growth was prioritized. Yes, this creates rent-seeking space—but corruption is a risk, not a destiny. Huntington’s view is very domestic-centric. He argues that once political institutions become sufficiently institutionalized, democracy becomes possible—even likely. But he largely ignores external forces. Taiwan’s democratization in the 1980s wasn’t just about the middle class. It also involved U.S. pressure, Cold War geopolitics, and shifting international norms. Later thinkers like Fukuyama move the discussion forward, pointing to multipolarity, identity crises, and colonial legacies as ongoing forces shaping political stability today. So here’s where I'll pause. When you look at Taiwan today, are we mainly facing an identity struggle—or something deeper about institutions and order? And when you look at China, is stability the outcome of legitimacy, fear, performance—or all three? These are not questions with clean answers. But if political development teaches us anything, it’s this: history never disappears—it just waits.`, 
-                content_zh: `第 4 週：民主之前的秩序，以及歷史留下的重量。這一週，我想從一個看起來像巧合、但其實很可能不是巧合的地方開始。當我們談亞洲四小龍時，很快就會發現，它們之間有一些非常一致的特徵。第一，它們全部都是發展中國家。第二，在發展初期，它們幾乎都沒有選擇自由貿易，而是關起門來發展。第三，也是最常被忽略的一點——它們全部都有殖民經驗。在亞洲，唯一沒有被殖民過的國家是泰國。其他國家，多多少少都被捲進過帝國主義的歷史。二戰後，這些國家陸續獨立。但很多人會在這裡產生一個錯誤期待：獨立等於民主。事實恰恰相反，許多國家在獨立後，很快進入軍事獨裁或高度威權體制。這就逼我們回頭問一個問題：如果獨立不保證民主，那政治發展到底需要什麼？以 1950 到 1970 年代的台灣為例。那個時代的政治語言，反覆強調「自強」與「復興」。但仔細想想，一個自信、穩定的國家，並不會天天提醒自己要復興。只有當你覺得某些東西失去了，復興才會變成政治口號。這也能幫助我們理解，為什麼早期國民黨如此強調文化正統性。在與中共競爭的過程中，他們選擇強調「中華文化」，而不是台灣文化——這不是單純的文化選擇，而是政治策略。接著，我們把視角拉回理論。政治發展常被拆成四個關鍵要素：秩序、發展、文化、身份認同。秩序排在第一位。秩序指的是國家能否穩定運作、用制度而非暴力處理衝突。杭廷頓在 1968 年說得很直接：發展中國家最重要的政治需求，不是民主，而是政治秩序。這句話讓很多人不舒服，但他的邏輯其實很清楚。當社會與經濟變遷跑得比政治制度快，混亂就會出現。發展，不只是 GDP 成長，標誌著制度能不能跟上變化。文化影響人們如何看待權威與服從。而身份認同，往往在制度薄弱時，才會變成尖銳的政治問題。那麼，我們該怎麼解釋不同國家的發展路徑？現代化理論給了一個非常樂觀、線性的答案：中產階級變有錢，民主自然會來。但歷史告訴我們，事情沒有這麼簡單。有些中產階級，反而更害怕不穩定。依賴理論與世界體系理論提醒我們，國家不是在真空中發展的。殖民歷史留下的不只是怨恨，也留下結構性的限制。你在全球體系中的位置，會影響你能做什麼選擇。發展型國家的經驗也很關鍵。早期的台灣、南韓、新加坡、香港，都不是高度民主國家。政府深度介入市場，經濟優先。這樣的體制確實創造尋租空間，但那是風險，不是必然結果。杭廷頓的觀點非常內生導向。他相信，只要制度化程度夠高，民主就會變得可能。但他幾乎不處理外在因素。台灣 1980 年代的民主化，不職是中產階級壯大的結果，也與美國壓力、冷戰結構、國際規範轉變密切相關。後來像 Fukuyama 這樣的學者，開始把視野放大，討論多極化、身份政治，以及殖民遺產如何持續影響當代政治穩定。所以，這一週我不打算替你總結答案。我只想留兩個問題給你。你怎麼理解今天台灣的政治拉扯——它主要是身份認同的問題，還是制度與秩序的問題？而中國的穩定，又是來自合法性、恐懼、績效，還是三者混合？政治發展從來不是直線。歷史也從來沒有離開，它只是暫時沉默。` 
+                content_zh: `第 4 週：民主之前的秩序，以及歷史留下的重量。這一週，我想從一個看起來像巧合、但其實很可能不是巧合的地方開始。當我們談亞洲四小龍時，很快就會發現，它們之間有一些非常一致的特徵。第一，它們全部都是發展中國家。第二，在發展初期，它們幾乎都沒有選擇自由貿易，而是關起門來發展。第三，也是最常被忽略的一點——它們全部都有殖民經驗。在亞洲，唯一沒有被殖民過的國家是泰國。其他國家，多多少少都被捲進過帝國主義的歷史。二戰後，這些國家陸續獨立。但很多人會在這裡產生一個錯誤期待：獨立等於民主。事實恰恰相反，許多國家在獨立後，很快進入軍事獨裁或高度威權體制。這就逼我們回頭問一個問題：如果獨立不保證民主，那政治發展到底需要什麼？以 1950 到 1970 年代的台灣為例。那個時代的政治語言，反覆強調「自強」與「復興」。但仔細想想，一個自信、穩定的國家，並不會天天提醒自己要復興。只有當你覺得某些東西失去了，復興才會變成政治口號。這也能幫助我們理解，為什麼早期國民黨如此強調文化正統性。在與中共競爭的過程中，他們選擇強調「中華文化」，而不是台灣文化——這不是單純的文化選擇，而是政治策略。接著，我們把視角拉回理論。政治發展常被拆成四個關鍵要素：秩序、發展、文化、身份認同。秩序排在第一位。秩序指的是國家能否穩定運作、用制度而非暴力處理衝突。杭廷頓在 1968 年說得很直接：發展中國家最重要的政治需求，不是民主，而是政治秩序。這句話讓很多人不舒服，但他的邏輯其實很清楚。當社會與經濟變遷跑得比政治制度快，混亂就會出現。發展，不只是 GDP 成長，標誌著制度能不能跟上變化。文化影響人們如何看待權威與服從。而身份認同，往往在制度薄弱時，才會變成尖銳的政治問題。那麼，我們該怎麼解釋不同國家的發展路徑？現代化理論給了一個非常樂觀、線性的答案：中產階級變有錢，民主自然會來。但歷史告訴我們，事情沒有這麼簡單。有些中產階級，反而更害怕不穩定。依賴理論與世界體系理論提醒我們，國家不是在真空中發展的。殖民歷史留下的不只是怨恨，也留下結構性的限制。你在全球體系中的位置，會影響你能做什麼選擇。發展型國家的經驗也很關鍵。早期的台灣、南韓、新加坡、香港，都不是高度民主國家。政府深度介入市場，經濟優先。這樣的體制確實創造尋租空間，但那是風險，不是必然結果。杭廷頓的觀點非常內生導向。他相信，只要制度化程度夠高，民主就會變得可能。但他幾乎不處理外在因素。台灣 1980 年代的民主化，並不職是中產階級壯大的結果，也與美國壓力、冷戰結構、國際規範轉變密切相關。後來像 Fukuyama 這樣的學者，開始把視野放大，討論多極化、身份政治，以及殖民遺產如何持續影響當代政治穩定。所以，這一週我不打算替你總結答案。我只想留兩個問題給你。你怎麼理解今天台灣的政治拉扯——它主要是身份認同的問題，還是制度與秩序的問題？而中國的穩定，又是來自合法性、恐懼、績效，還是三者混合？政治發展從來不是直線。歷史也從來沒有離開，它只是暫時沉默。` 
             },
             { 
                 week: 5, hasAudio: false, 
                 title_en: "Taiwan's Path", 
                 title_zh: "第五週：台灣民主化因素與認同", 
                 tags: ["Taiwan", "Democracy"], 
-                content_en: `Alright, let’s talk about Taiwan — and no, not in the simplistic “it just became democratic” kind of story. If democratization were driven by a single factor, political scientists would be out of a job. Taiwan is a textbook case precisely because it forces us to abandon monocausal explanations. What happened here was the result of several forces moving at the same time, sometimes reinforcing each other, sometimes creating pressure from different directions. First, we have to go back to the Japanese colonial period. Japan left behind a high-capacity bureaucratic structure, infrastructure, and a degree of social modernization. This didn’t make Taiwan democratic — but it created a state that could actually function. Second, geopolitics matters more than we like to admit. In 1987, the U.S. House of Representatives passed a resolution urging democratic reform in Taiwan. This was Cold War strategy. But external pressure still counts, and for authoritarian regimes dependent on international legitimacy, it matters. Third, and this is where Taiwanese society enters the picture: democracy was demanded, repeatedly. Social movements accumulated. KMT versus non-KMT forces reflected a deeper struggle over political participation and rights. Over time, this normalized democratic expectations. Now here’s the uncomfortable comparison. In 1989, China faced a similar moment. The key difference? Political elites. Chiang Ching-kuo did not choose violent repression. Instead, he encouraged younger generations to enter politics. Many scholars argue that without the Tiananmen crackdown, China’s political trajectory might look very different today. So no, Taiwan’s democratization cannot be reduced to culture, leadership, or foreign influence alone. It was interaction — not intention — that mattered. This brings us to historical narrative. Look at how history is taught. In Hong Kong textbooks, the 228 Incident becomes an “unpleasant episode.” Tiananmen is renamed “Political Turmoil between Spring and Summer of 1989.” Authoritarian power doesn’t only silence people; it rewrites memory. Finally, two concepts help us make sense of Taiwan’s situation. Abnormality: in most countries, citizens don’t wake up wondering whether their identity is a national security issue. Taiwan does. Ambiguity: paradoxically, this lack of clear sovereignty has allowed Taiwan to continue operating as the ROC under a relatively democratic system. So here’s the real question I'll leave you with: Is ambiguity a weakness — or has it been Taiwan’s greatest political resource?`, 
-                content_zh: `好，我們來談台灣。但我先說清楚，如果你期待一個「因為人民很努力所以民主化成功」的故事，那今天你會失望。如果民主化真的只靠單一因素解釋，政治學這門學科早就可以收起來了。台灣之所以重要，正是因為它迫使我們放棄單因論。民主不是某一天被「決定」的，而是多股力量在不同時間點彼此推擠、交錯，最後形成結果。第一個因素，我們必須回到日本殖民時期。日本留下的是一套高效的官僚體系、基礎建設與現代化社會結構。這不等於民主，但它創造了一個「能運作的國家機器」。而歷史告訴我們，沒有國家能力，民主往往活不久。第二，地緣政治不可忽視。1987 年，美國眾議院通過決議，要求台灣進行民主改革。這是不是出於道德關懷？坦白說，不是，這是冷戰邏輯。但對高度依賴國際支持的威權政權來說，外部壓力就是現實成本。第三，台灣社會本身的力量。民主不是一次性的運動，而是反覆累積的要求。國民黨與非國民黨的對抗，不只是政黨競爭，而是關於誰能參與政治、誰有發聲權。久而久之，民主成為一種「理所當然的期待」。接著，我們必須面對一個不舒服的比較：1989 年的中國。當時的歷史窗口其實存在，關鍵差異在於政治菁英的選擇。蔣經國沒有選擇暴力鎮壓，反而鼓勵年輕世代進入政治。許多學者認為，如果天安門沒有走向血腥結局，中國今天的政治樣貌可能完全不同。所以，台灣的民主化不是文化的奇蹟、不是領袖的恩賜、也不是美國單方面推動的結果，而是多重因素互動的產物。這也解釋了為什麼「歷史敘事」如此關鍵。在香港課本裡，二二八變成「不愉快的事件」，天安門被稱為「1989 年春夏之交的政治風波」。威權不只封口，它還改寫你怎麼記得。最後是身份認同。中國人還是台灣人？身份來自個人經驗、世代記憶與外部影響。今天，中國的軟實力——TikTok、小紅書、媒體敘事——實際上正參與這個認同塑造的過程。兩個概念可以幫助我們理解台灣：異常性：多數國家的公民不需要每天思考自己的身份是否牽涉國安，台灣卻必須。模糊性：正因為主權未被釘死，台灣反而得以在 ROC 名義下，維持一套相對民主的制度。所以，我想問的不是「台灣是不是正常國家」，而是——這種模糊，到底是風險，還是台灣最成功的政治策略？` 
+                content_en: `Alright, let’s talk about Taiwan — and no, not in the simplistic “it just became democratic” kind of story. If democratization were driven by a single factor, political scientists would be out of a job. Taiwan is a textbook case precisely because it forces us to abandon monocausal explanations. What happened here was the result of several forces moving at the same time, sometimes reinforcing each other, sometimes creating pressure from different directions. First, we have to go back to the Japanese colonial period. Japan left behind a high-capacity bureaucratic structure, infrastructure, and a degree of social modernization. This didn’t make Taiwan democratic — but it created a state that actually function. Second, geopolitics matters more than we like to admit. In 1987, the U.S. House of Representatives passed a resolution urging democratic reform in Taiwan. This was Cold War strategy. But external pressure still counts, and for authoritarian regimes dependent on international legitimacy, it matters. Third, and this is where Taiwanese society enters the picture: democracy was demanded, repeatedly. Social movements accumulated. KMT versus non-KMT forces reflected a deeper struggle over political participation and rights. Over time, this normalized democratic expectations. Now here’s the uncomfortable comparison. In 1989, China faced a similar moment. The key difference? Political elites. Chiang Ching-kuo did not choose violent repression. Instead, he encouraged younger generations to enter politics. Many scholars argue that without the Tiananmen crackdown, China’s political trajectory might look very different today. So no, Taiwan’s democratization cannot be reduced to culture, leadership, or foreign influence alone. It was interaction — not intention — that mattered. This brings us to historical narrative. Look at how history is taught. In Hong Kong textbooks, the 228 Incident becomes an “unpleasant episode.” Tiananmen is renamed “Political Turmoil between Spring and Summer of 1989.” Authoritarian power doesn’t only silence people; it rewrites memory. Finally, two concepts help us make sense of Taiwan’s situation. Abnormality: in most countries, citizens don’t wake up wondering whether their identity is a national security issue. Taiwan does. Ambiguity: paradoxically, this lack of clear sovereignty has allowed Taiwan to continue operating as the ROC under a relatively democratic system. So here’s the real question I'll leave you with: Is ambiguity a weakness — or has it been Taiwan’s greatest political resource?`, 
+                content_zh: `好，我們來談台灣。但我先說清楚，如果你期待一個「因為人民很努力所以民主化成功」的故事，那今天你會失望。如果民主化真的只靠單一因素解釋，政治學這門學科早就可以收起來了。台灣之所以重要，正是因為它迫使我們放棄單因論。民主不是某一天被「決定」的，而是多股力量在不同時間點彼此推擠、交錯，最後形成結果。第一個因素，我們必須回到日本殖民時期。日本留下的是一套高效的官僚體系、基礎建設與現代化社會結構。這不等於民主，但它創造了一個「能運作的國家機器」。而歷史告訴我們，沒有國家能力，民主往往活不久。第二，地緣政治不可忽視。1987 年，美國眾議院通過決議，要求台灣進行民主改革。這是不是出於道德關懷？坦白說，不是，這是冷戰邏輯。但對高度依賴國際支持的威權政權來說，外部壓力就是現實成本。第三，台灣社會本身的力量。民主不是一次性的運動，而是反覆累積的要求。國民黨與非國民黨的對抗，不只是政黨競爭，而是關於誰能參與政治、誰有發聲權。久而之，民主成為一種「理所當然的期待」。接著，我們必須面對一個不舒服的比較：1989 年的中國。當時的歷史窗口其實存在，關鍵差異在於政治菁英的選擇。蔣經國沒有選擇暴力鎮壓，反而鼓勵年輕世代進入政治。許多學者認為，如果天安門沒有走向血腥結局，中國今天的政治樣貌可能完全不同。所以，台灣的民主化不是文化的奇蹟、不是領袖的恩賜、也不是美國單方面推動的結果，而是多重因素互動的產物。這也解釋了為什麼「歷史敘事」如此關鍵。在香港課本裡，二二八變成「不愉快的事件」，天安門被稱為「1989 年春夏之交的政治風波」。威權不只封口，它還改寫你怎麼記得。最後是身份認同。中國人還是台灣人？身份來自個人經驗、世代記憶與外部影響。今天，中國的軟實力——TikTok、小紅書、媒體敘事——實際上正參與這個認同塑造的過程。兩個概念可以幫助我們理解台灣：異常性：多數國家的公民不需要每天思考自己的身份是否牽涉國安，台灣卻必須。模糊性：正因為主權未被釘死，台灣反而得以在 ROC 名義下，維持一套相對民主的制度。所以，我想問的不是「台灣是不是正常國家」，而是——這種模糊，到底是風險，還是台灣最成功的政治策略？` 
             },
             { 
                 week: 6, hasAudio: false, 
@@ -174,7 +278,7 @@
                 title_zh: "第八週：全學期回顧與核心啟示", 
                 tags: ["Summary", "Final"], 
                 content_en: `Hello everyone, welcome to the final episode of this semester’s course, Political Development. Today, we’re not going to drill into details or recite bullet points. Instead, we want to take a step back and see the bigger picture: what has this course really taught us? If we had to summarize in one sentence, it’s this: Political development is about how countries navigate order, culture, development, and identity to find a political path that works for them. It’s rarely linear, and there’s no one-size-fits-all formula. Take the story of the Four Asian Tigers—Taiwan, South Korea, Hong Kong, and Singapore. Modernization theory tells us that a rising middle class may push for democracy—but reality is more complex. Dependency theory and world system theory remind us that history and geopolitical position profoundly shape outcomes. Taiwan’s democratization demonstrates that change rarely comes from a single factor. It was an interplay of internal efforts and external pressures: Japanese colonial legacy, U.S. pressure, social movements, and elite choices. Hong Kong and Macau remind us that economic prosperity does not automatically lead to political freedom. British institutions and apoliticism drove short-term success, but long-term stability is always tested by social consciousness and external pressures. Finally, China’s PRC offers another lesson. Mao, Deng, and Xi took different approaches, but shared the same goal: maintain CCP rule. We see the logic of political survival using ideology, economic strategy, and nationalism. In summary, this course gives us three key takeaways: 1. Political development is the result of multiple interacting factors. 2. Order and development often take precedence over democracy in developing countries. 3. External environments and historical contexts deeply influence political trajectories. So next time you analyze political development, remember: only by understanding context and causality can we truly grasp a country’s political journey. That wraps up our semester. Thank you for listening, and I hope these insights provide a clear framework for your future thinking.`, 
-                content_zh: `大家好，歡迎收聽這學期《Political Development》的最後一集。我們今天不談細節案例，也不背條列筆記，而是試著把整個課程串起來，看看這門課到底教了我們什麼。如果用一句話概括，這門課就是在探索：國家如何從秩序、文化、發展和認同的角度，找到適合自己的政治道路。我們學到，政治發展不是一條直線，也不是一套公式，而是多因素交互作用的結果。從亞洲四小龍的故事開始：台灣、南韓、香港、新加坡，它們都是發展中國家，曾經受殖民，早期閉關，後來卻在經濟上取得驚人成就。現代化理論告訴我們，中產階級崛起可能帶來民主化的需求，但現實遠比理論複雜。發展型國家模式告訴我們，政府強力介入經濟，也可能在繁榮和自由之間找到平衡。再看看台灣的民主化過程。這不是單一因素的結果，而是內部努力與外部壓力交織的產物：日本殖民遺產、美國地緣政治施壓、社會運動培養民主文化，而政治精英選擇不阻擋改革。而港澳提醒我們，經濟繁榮與政治自由的關係並不單純。英國留下的體系塑造了短期的成功，但隨著社會結構變化，穩定性就面臨挑戰。最後看中國（PRC）的案例。三位領導人策略不同，但目標一致：維持一黨專政。我們看到如何運用意識形態、經濟和民族主義來鞏固政權。總結本課程教給我們三個啟示：第一，政治發展是多因素交互的過程，不能單看經濟或文化。第二，秩序與發展往往優先於民主，尤其在發展中國家。第三，外部環境與歷史脈絡，都會深刻影響國家的政治道路。當你下次談論政治發展時，記得：理解因果與脈絡，才能真正看懂一個國家的政治旅程。謝謝大家收聽，也希望這些觀念能提供你們未來的思考框架。` 
+                content_zh: `大家好，歡迎收聽這學期《Political Development》的最後一集。我們今天不談細節案例，也不背條列筆記，職是試著把整個課程串起來，看看這門課到底教了我們什麼。如果用一句話概括，這門課就是在探索：國家如何從秩序、文化、發展和認同的角度，找到適合自己的政治道路。我們學到，政治發展不是一條直線，也不是一套公式，職是多因素交互作用的結果。從亞洲四小龍的故事開始：台灣、南韓、香港、新加坡，它們都是發展中國家，曾經受殖民，早期閉關，後來卻在經濟上取得驚人成就。現代化理論告訴我們，中產階級崛起可能帶來民主化的需求，但現實遠比理論複雜。發展型國家模式告訴我們，政府強力介入經濟，也可能在繁榮和自由之間找到平衡。再看看台灣的民主化過程。這不是單一因素的結果，而是內部努力與外部壓力交織的產物：日本殖民遺產、美國地緣政治施壓、社會運動培養民主文化，而政治精英選擇不阻擋改革。而港澳提醒我們，經濟繁榮與政治自由的關係並不單純。英國留下的體系塑造了短期的成功，但隨著社會結構變化，穩定性就面臨挑戰。最後看中國（PRC）的案例。三位領導人策略不同，但目標一致：維持一黨專政。我們看到如何運用意識形態、經濟和民族主義來鞏固政權。總結本課程教給我們三個啟示：第一，政治發展是多因素交互的過程，不能單看經濟或文化。第二，秩序與發展往往優先於民主，尤其在發展中國家。第三，外部環境與歷史脈絡，都會深刻影響國家的政治道路。當你下次談論政治發展時，記得：理解因果與脈絡，才能真正看懂一個國家的政治旅程。謝謝大家收聽，也希望這些觀念能提供你們未來的思考框架。` 
             }
         ];
 
@@ -185,7 +289,6 @@
         let isDarkMode = false;
         let lastCharIndex = 0; 
         let currentSpeakingIndex = 0;
-
         let audioPlayer = new Audio();
         let ttsSpeech = new SpeechSynthesisUtterance();
 
@@ -193,31 +296,52 @@
             renderPlaylist();
             updateUI();
             
+            // Sync UI when MP3 loads or plays
+            audioPlayer.onloadedmetadata = () => updateTimeDisplay(audioPlayer.duration);
             audioPlayer.ontimeupdate = () => {
                 if (!audioPlayer.duration) return;
                 const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
                 document.getElementById('progress-fill').style.width = progress + '%';
+                updateTimeDisplay(audioPlayer.duration - audioPlayer.currentTime);
             };
-            
             audioPlayer.onended = () => {
                 isPlaying = false;
                 document.getElementById('play-icon').className = 'fas fa-play ml-1';
             };
         }
 
+        function updateTimeDisplay(seconds) {
+            if (isNaN(seconds)) return;
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            document.getElementById('display-time').innerText = `${mins}:${secs.toString().padStart(2, '0')} REMAINING`;
+        }
+
+        function estimateTTSTime(text, rate) {
+            const speed = isEnglish ? 160 : 250;
+            const count = isEnglish ? text.split(/\s+/).length : text.length;
+            return (count / speed) * 60 / rate;
+        }
+
         function renderPlaylist() {
             const list = document.getElementById('playlist');
             list.innerHTML = '';
             podcastData.forEach((item, index) => {
+                const isActive = index === currentIndex;
                 const div = document.createElement('div');
-                div.className = `premium-card p-4 rounded-xl cursor-pointer flex justify-between items-center transition-all ${index === currentIndex ? 'selected-item' : 'opacity-60 hover:opacity-100'}`;
+                div.className = `episode-card glass-card p-5 rounded-3xl cursor-pointer flex justify-between items-center ${isActive ? 'active' : 'opacity-60 hover:opacity-100'}`;
                 div.onclick = () => selectEpisode(index);
                 div.innerHTML = `
-                    <div class="flex items-center space-x-4">
-                        <span class="text-xs font-black opacity-30">0${index+1}</span>
+                    <div class="flex items-center space-x-5">
+                        <div class="w-10 h-10 rounded-2xl flex items-center justify-center font-black text-xs ${isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800'}">
+                            ${(index+1).toString().padStart(2, '0')}
+                        </div>
                         <div>
                             <h4 class="font-bold text-sm leading-tight">${isEnglish ? item.title_en : item.title_zh}</h4>
-                            <span class="text-[8px] font-black ${item.hasAudio && isEnglish ? 'text-blue-500' : 'opacity-40'}">${item.hasAudio && isEnglish ? 'PROFESSOR VOICE' : 'AI TTS'}</span>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <span class="text-[8px] font-black opacity-40 uppercase tracking-widest">${item.tags[0]}</span>
+                                ${item.hasAudio && isEnglish ? '<span class="text-[7px] font-black prof-voice-badge px-1.5 py-0.5 rounded-md">PREMIUM VOICE</span>' : ''}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -246,27 +370,37 @@
         function updateUI() {
             const data = podcastData[currentIndex];
             document.getElementById('display-title').innerText = isEnglish ? data.title_en : data.title_zh;
-            document.getElementById('display-ep').innerText = `EP 0${currentIndex + 1}`;
-            document.getElementById('script-content').innerText = isEnglish ? data.content_en : data.content_zh;
+            document.getElementById('display-ep').innerText = `EPISODE ${(currentIndex + 1).toString().padStart(2, '0')}`;
+            
+            // Format transcript into sentences for better reading
+            document.getElementById('script-content').innerHTML = (isEnglish ? data.content_en : data.content_zh)
+                .split('. ')
+                .map(s => `<span class="transcript-line">${s}. </span>`)
+                .join('');
+            
             document.getElementById('rate-display').innerText = currentRate + 'x';
             
             const modeTag = document.getElementById('audio-mode');
             if (data.hasAudio && isEnglish) {
-                modeTag.innerText = "PROF VOICE";
-                modeTag.className = "mode-tag bg-blue-100 text-blue-600 dark:bg-blue-900/40";
+                modeTag.innerText = "PROFESSOR VOICE";
+                modeTag.classList.add('prof-voice-badge');
+                document.getElementById('display-time').innerText = "Streaming Cloud Audio...";
             } else {
                 modeTag.innerText = "AI MECHANICAL";
-                modeTag.className = "mode-tag bg-slate-100 text-slate-500 dark:bg-slate-800";
+                modeTag.classList.remove('prof-voice-badge');
+                const totalSec = estimateTTSTime(isEnglish ? data.content_en : data.content_zh, currentRate);
+                updateTimeDisplay(totalSec);
             }
 
-            const text = isEnglish ? data.content_en : data.content_zh;
-            const wordCount = isEnglish ? text.split(/\s+/).length : text.length;
-            document.getElementById('word-count').innerText = `${wordCount} ${isEnglish ? 'Words' : '字'}`;
+            document.getElementById('btn-en').className = isEnglish ? 'px-6 py-2.5 text-[10px] font-black rounded-xl bg-blue-600 text-white shadow-lg' : 'px-6 py-2.5 text-[10px] font-black rounded-xl text-slate-400';
+            document.getElementById('btn-zh').className = !isEnglish ? 'px-6 py-2.5 text-[10px] font-black rounded-xl bg-blue-600 text-white shadow-lg' : 'px-6 py-2.5 text-[10px] font-black rounded-xl text-slate-400';
 
             const tagBox = document.getElementById('keywords-container');
             tagBox.innerHTML = '';
             data.tags.forEach(t => {
-                const s = document.createElement('span'); s.className = 'tag'; s.innerText = t;
+                const s = document.createElement('span'); 
+                s.className = 'text-[9px] font-black px-3 py-1 rounded-full bg-blue-500/5 text-blue-500 border border-blue-500/10 uppercase tracking-widest'; 
+                s.innerText = t;
                 tagBox.appendChild(s);
             });
         }
@@ -277,28 +411,25 @@
 
             if (isPlaying) {
                 if (useAudio) audioPlayer.pause();
-                else {
-                    window.speechSynthesis.cancel();
-                    lastCharIndex = currentSpeakingIndex;
-                }
+                else { window.speechSynthesis.cancel(); lastCharIndex = currentSpeakingIndex; }
                 isPlaying = false;
                 document.getElementById('play-icon').className = 'fas fa-play ml-1';
+                document.getElementById('play-status').innerText = 'Paused';
             } else {
                 if (useAudio) {
-                    if (!audioPlayer.src || audioPlayer.src.indexOf(`ep${currentIndex+1}_en.mp3`) === -1) {
-                        audioPlayer.src = `audio/ep${currentIndex+1}_en.mp3`;
-                    }
+                    // Google Drive Direct Link Construction
+                    const directUrl = `https://docs.google.com/uc?export=download&id=${data.audioId}`;
+                    if (audioPlayer.src !== directUrl) audioPlayer.src = directUrl;
                     audioPlayer.playbackRate = currentRate;
-                    audioPlayer.play().catch(e => {
-                        console.error("Audio error:", e);
-                        alert("音檔載入失敗，請確認檔案路徑：audio/ep" + (currentIndex+1) + "_en.mp3");
-                    });
+                    audioPlayer.play().catch(e => alert("Audio failed to load. Check Google Drive permissions."));
                 } else {
                     startTTS();
                 }
                 isPlaying = true;
                 document.getElementById('play-icon').className = 'fas fa-pause';
+                document.getElementById('play-status').innerText = 'Streaming';
             }
+            renderPlaylist();
         }
 
         function startTTS() {
@@ -310,11 +441,14 @@
             ttsSpeech.lang = isEnglish ? 'en-US' : 'zh-TW';
             ttsSpeech.rate = currentRate;
 
+            const totalTTSSeconds = estimateTTSTime(fullText, currentRate);
+
             ttsSpeech.onboundary = (event) => {
                 if (event.name === 'word') {
                     currentSpeakingIndex = lastCharIndex + event.charIndex;
-                    const progress = (currentSpeakingIndex / fullText.length) * 100;
-                    document.getElementById('progress-fill').style.width = progress + '%';
+                    const percent = currentSpeakingIndex / fullText.length;
+                    document.getElementById('progress-fill').style.width = (percent * 100) + '%';
+                    updateTimeDisplay(totalTTSSeconds * (1 - percent));
                 }
             };
 
@@ -323,6 +457,7 @@
                     isPlaying = false;
                     lastCharIndex = 0;
                     document.getElementById('play-icon').className = 'fas fa-play ml-1';
+                    renderPlaylist();
                 }
             };
             window.speechSynthesis.speak(ttsSpeech);
@@ -334,15 +469,12 @@
                 audioPlayer.currentTime = Math.max(0, Math.min(audioPlayer.duration, audioPlayer.currentTime + seconds));
             } else {
                 const fullText = isEnglish ? data.content_en : data.content_zh;
-                const charsPerSec = isEnglish ? 16 : 6;
+                const charsPerSec = isEnglish ? 18 : 8;
                 const jump = seconds * charsPerSec * currentRate;
                 lastCharIndex = Math.max(0, Math.min(fullText.length, (isPlaying ? currentSpeakingIndex : lastCharIndex) + jump));
                 currentSpeakingIndex = lastCharIndex;
                 if (isPlaying) startTTS();
-                else {
-                    const progress = (lastCharIndex / fullText.length) * 100;
-                    document.getElementById('progress-fill').style.width = progress + '%';
-                }
+                else document.getElementById('progress-fill').style.width = (lastCharIndex / fullText.length * 100) + '%';
             }
         }
 
@@ -354,25 +486,24 @@
             document.getElementById('rate-display').innerText = currentRate + 'x';
 
             if (isPlaying) {
-                const data = podcastData[currentIndex];
-                if (data.hasAudio && isEnglish) {
+                if (podcastData[currentIndex].hasAudio && isEnglish) {
                     audioPlayer.playbackRate = currentRate;
                 } else {
                     lastCharIndex = currentSpeakingIndex;
                     startTTS();
                 }
+            } else {
+                updateUI();
             }
         }
 
         function handleSeek(e) {
             const container = e.currentTarget;
             const percent = e.offsetX / container.offsetWidth;
-            const data = podcastData[currentIndex];
-
-            if (data.hasAudio && isEnglish) {
+            if (podcastData[currentIndex].hasAudio && isEnglish) {
                 if (audioPlayer.duration) audioPlayer.currentTime = audioPlayer.duration * percent;
             } else {
-                const fullText = isEnglish ? data.content_en : data.content_zh;
+                const fullText = isEnglish ? podcastData[currentIndex].content_en : podcastData[currentIndex].content_zh;
                 lastCharIndex = Math.floor(fullText.length * percent);
                 currentSpeakingIndex = lastCharIndex;
                 if (isPlaying) startTTS();
@@ -387,16 +518,15 @@
             renderPlaylist();
         }
 
-        function prevWeek() { currentIndex = (currentIndex - 1 + podcastData.length) % podcastData.length; selectEpisode(currentIndex); }
-        function nextWeek() { currentIndex = (currentIndex + 1) % podcastData.length; selectEpisode(currentIndex); }
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
             document.body.classList.toggle('dark-mode');
             document.getElementById('dark-icon').className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
         }
+
         function copyScript() {
             const t = document.getElementById('script-content').innerText;
-            navigator.clipboard.writeText(t).then(() => alert('Script Copied!'));
+            navigator.clipboard.writeText(t).then(() => alert('Copied to Clipboard'));
         }
 
         init();
